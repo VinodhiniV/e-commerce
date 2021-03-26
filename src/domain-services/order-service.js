@@ -6,9 +6,9 @@ const CostCalculatorService = require('./cost-calculator-service');
 const PlaceOrderResponse = require('../response/place-order-response')
 
 function OrdersService() {
-
+    const ordersRepository = new OrdersRepository()
     async function getOrders() {
-        return await new OrdersRepository().findAll();
+        return await ordersRepository.findAll();
     }
 
     async function placeOrder(orderRequestData) {
@@ -29,7 +29,7 @@ function OrdersService() {
         //Perform domain validation (checks for availability of product)
         if (domainOrder.canPlaceOrder(orderRequestData)) {
             //store the order in the repository
-            const orderId = await new OrdersRepository().save(domainOrder);
+            const orderId = await ordersRepository.save(domainOrder);
             const response = new PlaceOrderResponse(true, "Order Successfully Place",orderId);
             //publish
             // _publisher.Publish(MapToContract(domainOrder, orderId));
@@ -39,22 +39,6 @@ function OrdersService() {
             const response = new PlaceOrderResponse(false, "Order validation failed", null);
             return response;
         }
-
-        // try {
-        //     //Calculate total cost
-        //     this.totalCost = CostCalculatorService.calculateCost(orderRequestData);
-        //     //Calculate transit locations
-        //     const orderData = {
-        //         orderLines: new OrderLine(orderRequestData),
-        //         customerId: orderRequestData.customerId,
-        //         totalCost: this.totalCost,
-        //         datePlaced: new Date()
-        //     };
-        //     const order = new Order(orderData);
-        //     return await new OrdersRepository().save(order);
-        // } catch {
-        //     throw new Error(401, 'Product');
-        // }
     }
 
     return {

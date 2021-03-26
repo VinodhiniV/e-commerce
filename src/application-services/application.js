@@ -9,17 +9,16 @@ app.use(bodyParser.json());
 app.use(cors());
 
 const OrdersService = require('../domain-services/order-service');
-
+const orderService = new OrdersService();
 // function ApplicationService(OrdersService) {
 
-app.get('/orders', (req, res) => {
-  const orders = {};
-  res.send(orders);
+app.get('/orders', async (req, res) => {
+  const orders = await orderService.getOrders();
+  res.status(200).send(orders);
 });
 
 app.post('/placeOrder', async (req, res) => {
   // const { item } = req.body;
-  const orderService = new OrdersService();
     let id = await orderService.placeOrder(req.body);
     console.log('ID is ', id)
      
