@@ -18,21 +18,23 @@ app.get('/orders', (req, res) => {
 });
 
 app.post('/placeOrder', async (req, res) => {
-  const { item } = req.body;
+  // const { item } = req.body;
   const orderService = new OrdersService();
-  let id = await orderService.placeOrder(item);
-console.log('ID is ', id)
+    let id = await orderService.placeOrder(req.body);
+    console.log('ID is ', id)
+     
+    
+      // await axios.post('http://localhost:4005/events', {
+      //   type: 'OrderCreated',
+      //   data: {
+      //     id,
+      //     item
+      //   }
+      // });
+    
+      res.status(201).send(id);
  
-
-  // await axios.post('http://localhost:4005/events', {
-  //   type: 'OrderCreated',
-  //   data: {
-  //     id,
-  //     item
-  //   }
-  // });
-
-  res.status(201).send(id);
+ 
 });
 
 app.post('/events', (req, res) => {
