@@ -4,7 +4,9 @@ function OrdersRepository() {
 
     async function findAll() {
         console.log('Successfully getting all Orders : ', orders.length);
-        return orders;
+        return orders.map((order)=> {
+            return {id: order.id,totalCost: order.totalCost}
+        });
     }
 
     async function save(order) {
