@@ -1,17 +1,18 @@
 const Order = require('../domain-models/order');
-const OrdersRepository = require('../repository-services/order-repository');
+// const OrdersRepository = require('../repository-services/order-repository');
 const OrderLine = require('../domain-models/order-line');
 const Product = require('../domain-models/product');
 const CostCalculatorService = require('./cost-calculator-service');
 const PlaceOrderResponse = require('../response/place-order-response')
 
-function OrdersService() {
-    const ordersRepository = new OrdersRepository()
-    async function getOrders() {
-        return await ordersRepository.findAll();
+function OrdersService(ordersRepository) {  
+    this.ordersRepository = new ordersRepository();
+
+    this.getOrders = async  () => {
+        return await this.ordersRepository.findAll();
     }
 
-    async function placeOrder(orderRequestData) {
+    this.placeOrder= async (orderRequestData)=> {
         //Create domain order from the request
         const orderLines = [];
         for (lineCount = 0; lineCount > orderRequestData.order.orderLines.length; orderRequestData.order.orderLines) {
@@ -29,7 +30,8 @@ function OrdersService() {
         //Perform domain validation (checks for availability of product)
         if (domainOrder.canPlaceOrder(orderRequestData)) {
             //store the order in the repository
-            const orderId = await ordersRepository.save(domainOrder);
+            console.log('Orders Repo is ', this.ordersRepository);
+            const orderId = await this.ordersRepository.save(domainOrder);
             const response = new PlaceOrderResponse(true, "Order Successfully Place",orderId);
             //publish
             // _publisher.Publish(MapToContract(domainOrder, orderId));
@@ -40,12 +42,14 @@ function OrdersService() {
             return response;
         }
     }
-
-    return {
-        getOrders,
-        placeOrder
-    };
 }
+
+
+
+    // return {
+    //     getOrders,
+    //     placeOrder
+    // };
 
 module.exports = OrdersService
 

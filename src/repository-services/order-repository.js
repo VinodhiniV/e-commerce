@@ -1,24 +1,25 @@
 function OrdersRepository() {
+    this.orders = [];
 
-    const orders = [];
-
-    async function findAll() {
-        console.log('Successfully getting all Orders : ', orders.length);
-        return orders.map((order)=> {
-            return {id: order.id,totalCost: order.totalCost}
+    this.findAll = async () => {
+        console.log('Successfully getting all Orders : ', this.orders.length);
+        return this.orders.map((order) => {
+            return { id: order.id, totalCost: order.totalCost }
         });
-    }
-
-    async function save(order) {
+    }   
+    
+    this.save =  async (order) => {
         console.log('Successfully Saved Order : ', order.id);
-        orders.push(order);
+         await this.orders.push(order);
         return order.id;
     }
-
-    return {
-        findAll,
-        save
-    };
 }
+
+
+// return {
+//     findAll,
+//     save
+// };
+// }
 
 module.exports = OrdersRepository
