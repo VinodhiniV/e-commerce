@@ -4,11 +4,12 @@ const Product = require('../domain-models/product');
 const CostCalculatorService = require('./cost-calculator-service');
 const PlaceOrderResponse = require('../response/place-order-response')
 
-function OrdersService(ordersRepository) {  
-    this.ordersRepository = ordersRepository;
+function OrdersService(ordersRepositoryService, publisherService) {  
+    this.ordersRepositoryService = ordersRepositoryService;
+    this.publisherService = publisherService;
 
     this.getOrders = async  () => {
-        return await this.ordersRepository.findAll();
+        return await this.ordersRepositoryService.findAll();
     }
 
     this.placeOrder= async (orderRequestData)=> {
@@ -28,18 +29,23 @@ function OrdersService(ordersRepository) {
 
         //Perform domain validation (checks for availability of product)
         if (domainOrder.canPlaceOrder(orderRequestData)) {
-            //store the order in the repository
-            console.log('Orders Repo is ', this.ordersRepository);
-            const orderId = await this.ordersRepository.save(domainOrder);
+            const orderId = await this.ordersRepositoryService.save(domainOrder);
             const response = new PlaceOrderResponse(true, "Order Successfully Place",orderId);
-            //publish
-            // _publisher.Publish(MapToContract(domainOrder, orderId));
+            
+            await publisherService.publish(this.createEvent(domainOrder, orderId));
+            
             return response;
         }
         else {
-            const response = new PlaceOrderResponse(false, "Order validation failed", null);
-            return response;
+            return new PlaceOrderResponse(false, "Order validation failed", null);
         }
+    }
+
+    this.createEvent = (domainOrder, orderId) => {
+        return {orderId, 
+            customerId: domainOrder.customerId,
+            totalCost: domainOrder.totalCost,
+            datePlaced:domainOrder.datePlaced}
     }
 }
 
