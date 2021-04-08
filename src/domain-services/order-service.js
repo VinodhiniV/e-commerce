@@ -4,36 +4,28 @@ const Product = require('../domain-models/product');
 const CostCalculatorService = require('./cost-calculator-service');
 const PlaceOrderResponse = require('../response/place-order-response')
 
-function OrdersService(ordersRepositoryService, publisherService) {  
+function OrdersService(ordersRepositoryService, publisherService) {
     this.ordersRepositoryService = ordersRepositoryService;
     this.publisherService = publisherService;
 
-    this.getOrders = async  () => {
+    this.getOrders = async () => {
         return await this.ordersRepositoryService.findAll();
     }
 
-    this.placeOrder= async (orderRequestData)=> {
-        //Create domain order from the request
-        const orderLines = [];
-        for (lineCount = 0; lineCount > orderRequestData.order.orderLines.length; orderRequestData.order.orderLines) {
-            const orderline = new OrderLine(
-                new Product(orderLine.product.id, orderLine.product.unitprice,orderLine.product.currency),
-                orderLine.quantity);
-            orderLines.push(orderLine);
-        }
+    this.placeOrder = async (orderRequestData) => {
+        const orderLines = createOrderLines(orderRequestData);
         const domainOrder = new Order(
             orderLines,
             orderRequestData.order.customerId,
             orderRequestData.order.datePlaced
         );
 
-        //Perform domain validation (checks for availability of product)
         if (domainOrder.canPlaceOrder(orderRequestData)) {
             const orderId = await this.ordersRepositoryService.save(domainOrder);
-            const response = new PlaceOrderResponse(true, "Order Successfully Place",orderId);
-            
-            await publisherService.publish(this.createEvent(domainOrder, orderId));
-            
+            const response = new PlaceOrderResponse(true, "Order Successfully Place", orderId);
+
+            await publisherService.publish(createEvent(domainOrder, orderId));
+
             return response;
         }
         else {
@@ -41,11 +33,24 @@ function OrdersService(ordersRepositoryService, publisherService) {
         }
     }
 
-    this.createEvent = (domainOrder, orderId) => {
-        return {orderId, 
+    function createEvent(domainOrder, orderId) {
+        return {
+            orderId,
             customerId: domainOrder.customerId,
             totalCost: domainOrder.totalCost,
-            datePlaced:domainOrder.datePlaced}
+            datePlaced: domainOrder.datePlaced
+        }
+    }
+
+    function createOrderLines(orderRequestData) {
+        const orderLines = [];
+        for (lineCount = 0; lineCount > orderRequestData.order.orderLines.length; orderRequestData.order.orderLines) {
+            const orderline = new OrderLine(
+                new Product(orderLine.product.id, orderLine.product.unitprice, orderLine.product.currency),
+                orderLine.quantity);
+            orderLines.push(orderLine);
+        }
+        return orderLines;
     }
 }
 

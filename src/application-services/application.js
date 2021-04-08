@@ -14,9 +14,9 @@ app.get('/orders', async (req, res) => {
 });
 
 app.post('/placeOrder', async (req, res) => {
-    let id = await ordersService.placeOrder(req.body);
-    console.log('Order ID is ', id)
-    res.status(201).send(id);
+    let response = await ordersService.placeOrder(req.body);
+    console.log('Order ID is ', response.orderid)
+    res.status(201).send(response);
 });
 
 app.post('/events', (req, res) => {
