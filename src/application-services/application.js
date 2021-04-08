@@ -10,7 +10,6 @@ app.use(cors());
 
 const OrdersService = require('../domain-services/order-service');
 const orderService = new OrdersService();
-// function ApplicationService(OrdersService) {
 
 app.get('/orders', async (req, res) => {
   const orders = await orderService.getOrders();
@@ -18,22 +17,8 @@ app.get('/orders', async (req, res) => {
 });
 
 app.post('/placeOrder', async (req, res) => {
-  // const { item } = req.body;
-    let id = await orderService.placeOrder(req.body);
-    console.log('ID is ', id)
-     
-    
-      // await axios.post('http://localhost:4005/events', {
-      //   type: 'OrderCreated',
-      //   data: {
-      //     id,
-      //     item
-      //   }
-      // });
-    
-      res.status(201).send(id);
- 
- 
+  let id = await orderService.placeOrder(req.body);
+  res.status(201).send(id);
 });
 
 app.post('/events', (req, res) => {
@@ -42,9 +27,6 @@ app.post('/events', (req, res) => {
   res.send({});
 });
 
-// return { app }
-
-// }
 
 module.exports = { app };
 
