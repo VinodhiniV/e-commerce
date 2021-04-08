@@ -13,22 +13,17 @@ var di = require('di4js');
 const OrdersService = require('../domain-services/order-service');
 const OrdersRepository = require('../repository-services/order-repository');
 
-// di
-// .autowired(true)
-// 	.register('OrdersRepository')
-// 		.as(OrdersRepository)
-//   .register('OrdersService')
-//     .as(OrdersService)
-//     .withConstructor()
-//     .param().ref('OrdersRepository');
+di
+.register('ordersRepository')
+	.as(OrdersRepository)
+		.withConstructor()
+	.param().val('')
+.register('ordersService')
+	.as(OrdersService)
+		.withConstructor()
+			.param().ref('ordersRepository')
 
-// let orderService = di.resolve('OrdersService');
-
-
-let orderService = new OrdersService(OrdersRepository);
-
-
-   
+var ordersService = di.resolve('ordersService');
 
 // function Checkbox(){ 
 //   this.$el = $("<input/>", { type: "checkbox" }); 
@@ -42,14 +37,14 @@ let orderService = new OrdersService(OrdersRepository);
 // function ApplicationService(OrdersService) {
 
 app.get('/orders', async (req, res) => {
-  const orders = await orderService.getOrders();
+  const orders = await ordersService.getOrders();
   res.status(200).send(orders);
 });
 
 app.post('/placeOrder', async (req, res) => {
   // const { item } = req.body;
-  console.log('Into Place Order... checking OrdersService', orderService);
-    let id = await orderService.placeOrder(req.body);
+  console.log('Into Place Order... checking OrdersService', ordersService);
+    let id = await ordersService.placeOrder(req.body);
     console.log('ID is ', id)
      
     

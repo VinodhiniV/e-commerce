@@ -15,11 +15,4 @@ function OrdersRepository() {
     }
 }
 
-
-// return {
-//     findAll,
-//     save
-// };
-// }
-
 module.exports = OrdersRepository

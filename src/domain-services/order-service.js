@@ -1,12 +1,11 @@
 const Order = require('../domain-models/order');
-// const OrdersRepository = require('../repository-services/order-repository');
 const OrderLine = require('../domain-models/order-line');
 const Product = require('../domain-models/product');
 const CostCalculatorService = require('./cost-calculator-service');
 const PlaceOrderResponse = require('../response/place-order-response')
 
 function OrdersService(ordersRepository) {  
-    this.ordersRepository = new ordersRepository();
+    this.ordersRepository = ordersRepository;
 
     this.getOrders = async  () => {
         return await this.ordersRepository.findAll();
@@ -43,13 +42,6 @@ function OrdersService(ordersRepository) {
         }
     }
 }
-
-
-
-    // return {
-    //     getOrders,
-    //     placeOrder
-    // };
 
 module.exports = OrdersService
 
